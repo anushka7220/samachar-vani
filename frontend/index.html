@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="dark">
+<head>
+  <title>Samachar Vani — समाचार वाणी</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════
+       THEME TOKENS
+    ═══════════════════════════════════════════ */
+    :root {
+      --saffron: #FF6B1A;
+      --saffron-light: #FF9A5C;
+      --gold: #F5C842;
+    }
+    [data-theme="dark"] {
+      --bg: #0D0A1A;
+      --bg2: #150F28;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,107,26,0.25);
+      --cream: #FFF4E0;
+      --text-muted: rgba(255,244,224,0.5);
+      --header-bg: rgba(13,10,26,0.82);
+      --ticker-bg: rgba(255,107,26,0.04);
+      --drop-bg: rgba(255,107,26,0.03);
+      --select-opt-bg: #1a1030;
+      --shadow-glow: rgba(255,107,26,0.35);
+      --shadow-glow-hover: rgba(255,107,26,0.55);
+      --noise-opacity: 0.4;
+      --modal-bg: #110D22;
+      --modal-overlay: rgba(5,3,14,0.88);
+      --input-bg: rgba(255,255,255,0.04);
+      --input-border: rgba(255,107,26,0.22);
+      --input-focus: rgba(255,107,26,0.55);
+    }
+    [data-theme="light"] {
+      --bg: #FDF6EE;
+      --bg2: #F5EAD8;
+      --card: rgba(255,107,26,0.05);
+      --border: rgba(200,90,10,0.18);
+      --cream: #1A0F00;
+      --text-muted: rgba(26,15,0,0.45);
+      --header-bg: rgba(253,246,238,0.88);
+      --ticker-bg: rgba(255,107,26,0.05);
+      --drop-bg: rgba(255,107,26,0.04);
+      --select-opt-bg: #FDF6EE;
+      --shadow-glow: rgba(255,107,26,0.2);
+      --shadow-glow-hover: rgba(255,107,26,0.4);
+      --noise-opacity: 0.12;
+      --modal-bg: #FFF8F0;
+      --modal-overlay: rgba(26,15,0,0.6);
+      --input-bg: rgba(255,107,26,0.04);
+      --input-border: rgba(200,90,10,0.2);
+      --input-focus: rgba(255,107,26,0.4);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg); color: var(--cream);
+      min-height: 100vh; overflow-x: hidden;
+      transition: background .4s, color .4s;
+    }
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:0;
+      opacity: var(--noise-opacity); transition: opacity .4s;
+    }
+
+    /* BACKGROUND GLOW */
+    .bg-glow { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .bg-glow::before {
+      content:''; position:absolute; top:-20%; left:-10%;
+      width:60vw; height:60vw;
+      background:radial-gradient(circle,rgba(255,107,26,.12) 0%,transparent 70%);
+      animation:drift 12s ease-in-out infinite alternate;
+    }
+    .bg-glow::after {
+      content:''; position:absolute; bottom:-20%; right:-10%;
+      width:50vw; height:50vw;
+      background:radial-gradient(circle,rgba(155,60,255,.08) 0%,transparent 70%);
+      animation:drift 15s ease-in-out infinite alternate-reverse;
+    }
+    [data-theme="light"] .bg-glow::after {
+      background:radial-gradient(circle,rgba(255,180,50,.1) 0%,transparent 70%);
+    }
+    @keyframes drift {
+      from{transform:translate(0,0) scale(1)}
+      to{transform:translate(3%,5%) scale(1.08)}
+    }
+
+    /* ═══════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════ */
+    .wrapper {
+      position:relative; z-index:1;
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      grid-template-rows:auto auto 1fr auto;
+    }
+
+    /* ═══════════════════════════════════════════
+       HEADER
+    ═══════════════════════════════════════════ */
+    header {
+      grid-column:1/-1;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:22px 48px;
+      border-bottom:1px solid var(--border);
+      backdrop-filter:blur(12px);
+      background:var(--header-bg);
+      transition:background .4s, border-color .4s;
+      position:sticky; top:0; z-index:10;
+    }
+    .logo-group { display:flex; align-items:center; gap:14px; }
+    .logo-icon {
+      width:42px; height:42px; border-radius:10px;
+      background:linear-gradient(135deg,var(--saffron),var(--gold));
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px;
+      animation:pulse-logo 3s ease-in-out infinite;
+    }
+    @keyframes pulse-logo {
+      0%,100%{box-shadow:0 0 24px rgba(255,107,26,.5)}
+      50%{box-shadow:0 0 42px rgba(255,107,26,.8),0 0 80px rgba(255,107,26,.3)}
+    }
+    .logo-text { display:flex; flex-direction:column; }
+    .logo-hindi {
+      font-family:'Rajdhani',sans-serif; font-weight:700; font-size:20px;
+      color:var(--saffron); letter-spacing:.05em; line-height:1;
+    }
+    .logo-sub {
+      font-size:10px; color:var(--text-muted);
+      letter-spacing:.2em; text-transform:uppercase; line-height:1.2;
+    }
+    .header-right { display:flex; align-items:center; gap:14px; }
+
+    /* THEME TOGGLE */
+    .theme-toggle { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
+    .toggle-icon { font-size:14px; color:var(--text-muted); transition:color .3s; }
+    .toggle-track {
+      width:44px; height:24px; border-radius:100px;
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--border);
+      position:relative; transition:background .3s;
+    }
+    [data-theme="light"] .toggle-track { background:rgba(255,107,26,.12); border-color:rgba(255,107,26,.3); }
+    .toggle-knob {
+      position:absolute; top:3px; left:3px;
+      width:16px; height:16px; border-radius:50%;
+      background:var(--saffron);
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+      display:flex; align-items:center; justify-content:center; font-size:9px;
+    }
+    [data-theme="light"] .toggle-knob { transform:translateX(20px); }
+
+    /* AUTH BUTTONS in header */
+    .header-auth { display:flex; gap:8px; align-items:center; }
+    .btn-auth-ghost {
+      padding:7px 16px; border-radius:8px;
+      border:1px solid var(--border);
+      background:none; color:var(--cream);
+      font-family:'Rajdhani',sans-serif; font-weight:600;
+      font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+      cursor:pointer; transition:border-color .2s, background .2s, color .4s;
+    }
+    .btn-auth-ghost:hover { border-color:var(--saffron); background:rgba(255,107,26,.06); }
+    .btn-auth-solid {
+      padding:7px 16px; border-radius:8px;
+      border:none;
+      background:linear-gradient(135deg,var(--saffron),#c44b00);
+      color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700;
+      font-size:12px; letter-spacing:.12em; text-transform:uppercase;
+      cursor:pointer; transition:opacity .2s, transform .2s;
+      box-shadow:0 4px 16px var(--shadow-glow);
+    }
+    .btn-auth-solid:hover { opacity:.88; transform:translateY(-1px); }
+
+    /* USER BADGE (shown when logged in) */
+    .user-badge {
+      display:none; align-items:center; gap:9px;
+      padding:6px 14px 6px 8px;
+      border:1px solid var(--border); border-radius:100px;
+      font-size:12px; color:var(--text-muted);
+    }
+    .user-badge.show { display:flex; }
+    .user-avatar {
+      width:26px; height:26px; border-radius:50%;
+      background:linear-gradient(135deg,var(--saffron),var(--gold));
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:#fff;
+      font-family:'Rajdhani',sans-serif;
+    }
+    .user-name { font-family:'Rajdhani',sans-serif; font-weight:600; color:var(--cream); }
+    .btn-logout {
+      background:none; border:none; color:var(--text-muted);
+      font-size:16px; cursor:pointer; line-height:1;
+      transition:color .2s; padding:0 2px;
+    }
+    .btn-logout:hover { color:var(--saffron); }
+
+    /* STATUS BADGE */
+    .header-badge {
+      display:flex; align-items:center; gap:8px;
+      padding:7px 14px;
+      border:1px solid var(--border); border-radius:100px;
+      font-size:11px; color:var(--text-muted); letter-spacing:.1em;
+      transition:border-color .4s;
+    }
+    .badge-dot {
+      width:7px; height:7px; border-radius:50%;
+      background:#4ade80; box-shadow:0 0 8px #4ade80;
+      animation:blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ═══════════════════════════════════════════
+       TICKER
+    ═══════════════════════════════════════════ */
+    .ticker-wrap {
+      grid-column:1/-1; overflow:hidden;
+      border-bottom:1px solid var(--border);
+      padding:10px 0; background:var(--ticker-bg);
+      transition:background .4s, border-color .4s;
+    }
+    .ticker-track {
+      display:flex; animation:ticker 32s linear infinite; white-space:nowrap;
+    }
+    .ticker-item {
+      display:flex; align-items:center; gap:28px; padding:0 28px;
+      font-family:'Rajdhani',sans-serif; font-size:12px;
+      color:var(--text-muted); letter-spacing:.1em;
+    }
+    .ticker-dot {
+      width:4px; height:4px; border-radius:50%;
+      background:var(--saffron); opacity:.6; flex-shrink:0;
+    }
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* ═══════════════════════════════════════════
+       LEFT PANEL
+    ═══════════════════════════════════════════ */
+    .left-panel {
+      grid-column:1; padding:56px 48px;
+      display:flex; flex-direction:column; justify-content:center; gap:28px;
+      border-right:1px solid var(--border); transition:border-color .4s;
+    }
+    .eyebrow {
+      display:flex; align-items:center; gap:10px;
+      font-size:11px; letter-spacing:.25em; text-transform:uppercase;
+      color:var(--saffron); font-family:'Rajdhani',sans-serif; font-weight:600;
+    }
+    .eyebrow::before {
+      content:''; display:block; width:28px; height:1px; background:var(--saffron);
+    }
+
+    /* ROTATING HEADLINE */
+    .headline-wrap { position:relative; min-height:190px; }
+    .headline {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(34px,3.5vw,52px); font-weight:900; line-height:1.1;
+      letter-spacing:-.02em;
+      position:absolute; top:0; left:0; width:100%;
+      opacity:0; transform:translateY(20px);
+      transition:opacity .55s ease, transform .55s ease;
+      pointer-events:none;
+    }
+    .headline.active { opacity:1; transform:translateY(0); pointer-events:auto; }
+    .headline.exit   { opacity:0; transform:translateY(-20px); }
+    .headline em {
+      font-style:normal;
+      background:linear-gradient(90deg,var(--saffron),var(--gold));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+
+    .lang-row { display:flex; align-items:center; gap:12px; }
+    .lang-pill {
+      padding:3px 11px; border-radius:100px;
+      font-size:10px; font-family:'Rajdhani',sans-serif;
+      font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+      transition:all .4s;
+    }
+    .lang-pill.en { background:rgba(255,107,26,.12); border:1px solid rgba(255,107,26,.35); color:var(--saffron); }
+    .lang-pill.hi { background:rgba(245,200,66,.12); border:1px solid rgba(245,200,66,.35); color:var(--gold); }
+    .slide-dots { display:flex; gap:6px; align-items:center; }
+    .slide-dot {
+      width:6px; height:6px; border-radius:50%;
+      background:var(--border); cursor:pointer;
+      transition:background .3s, width .3s;
+    }
+    .slide-dot.active { background:var(--saffron); width:18px; border-radius:3px; }
+
+    .tagline {
+      font-size:14.5px; color:var(--text-muted); line-height:1.8;
+      max-width:380px; font-weight:300; transition:color .4s;
+    }
+    .tagline strong { color:var(--cream); font-weight:500; }
+
+    .lifestyle-chips { display:flex; flex-wrap:wrap; gap:10px; }
+    .chip {
+      display:flex; align-items:center; gap:7px;
+      padding:7px 13px; border-radius:100px;
+      border:1px solid rgba(255,107,26,.2);
+      background:rgba(255,107,26,.06);
+      font-size:12px; color:var(--cream);
+      transition:border-color .3s, background .3s, color .4s;
+    }
+    .chip:hover { border-color:rgba(255,107,26,.5); background:rgba(255,107,26,.12); }
+
+    /* ═══════════════════════════════════════════
+       RIGHT PANEL
+    ═══════════════════════════════════════════ */
+    .right-panel {
+      grid-column:2; padding:56px 48px;
+      display:flex; flex-direction:column; justify-content:center; gap:22px;
+    }
+    .upload-section-title {
+      font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px;
+      letter-spacing:.2em; text-transform:uppercase; color:var(--text-muted);
+    }
+
+    /* LOCKED OVERLAY — shown when not logged in */
+    .upload-locked {
+      display:none;
+      flex-direction:column; align-items:center; gap:20px;
+      padding:56px 32px; border-radius:20px;
+      border:1.5px dashed rgba(255,107,26,.25);
+      background:rgba(255,107,26,.02);
+      text-align:center;
+    }
+    .upload-locked.show { display:flex; }
+    .lock-icon {
+      width:64px; height:64px; border-radius:16px;
+      background:linear-gradient(135deg,rgba(255,107,26,.12),rgba(245,200,66,.08));
+      border:1px solid rgba(255,107,26,.25);
+      display:flex; align-items:center; justify-content:center; font-size:26px;
+    }
+    .lock-title {
+      font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700; color:var(--cream);
+    }
+    .lock-sub { font-size:13px; color:var(--text-muted); line-height:1.7; }
+    .lock-actions { display:flex; gap:10px; }
+    .btn-lock-login, .btn-lock-signup {
+      padding:10px 22px; border-radius:10px;
+      font-family:'Rajdhani',sans-serif; font-weight:700;
+      font-size:13px; letter-spacing:.1em; text-transform:uppercase;
+      cursor:pointer; transition:all .2s;
+    }
+    .btn-lock-login {
+      border:1px solid var(--border); background:none; color:var(--cream);
+    }
+    .btn-lock-login:hover { border-color:var(--saffron); }
+    .btn-lock-signup {
+      border:none;
+      background:linear-gradient(135deg,var(--saffron),#c44b00);
+      color:#fff; box-shadow:0 6px 20px var(--shadow-glow);
+    }
+    .btn-lock-signup:hover { transform:translateY(-1px); opacity:.9; }
+
+    /* UPLOAD PANEL — shown when logged in */
+    .upload-panel { display:none; flex-direction:column; gap:20px; }
+    .upload-panel.show { display:flex; }
+
+    /* DROP ZONE */
+    .drop-zone {
+      border:1.5px dashed rgba(255,107,26,.35); border-radius:20px;
+      padding:40px 32px; text-align:center; cursor:pointer;
+      position:relative; background:var(--drop-bg);
+      transition:border-color .3s, background .3s;
+      display:flex; flex-direction:column; align-items:center; gap:14px;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color:var(--saffron); background:rgba(255,107,26,.07);
+    }
+    .drop-zone input[type="file"] {
+      position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+    }
+    .drop-icon {
+      width:58px; height:58px; border-radius:14px;
+      background:linear-gradient(135deg,rgba(255,107,26,.15),rgba(245,200,66,.1));
+      border:1px solid rgba(255,107,26,.3);
+      display:flex; align-items:center; justify-content:center; font-size:24px;
+    }
+    .drop-title { font-family:'Rajdhani',sans-serif; font-size:17px; font-weight:600; color:var(--cream); }
+    .drop-sub { font-size:12px; color:var(--text-muted); line-height:1.6; }
+    .drop-formats { display:flex; gap:8px; }
+    .fmt-tag {
+      padding:3px 9px; border-radius:4px; border:1px solid var(--border);
+      font-size:10px; color:var(--text-muted);
+      font-family:'Rajdhani',sans-serif; letter-spacing:.1em;
+    }
+
+    /* FILE SELECTED */
+    .file-selected {
+      display:none; align-items:center; gap:14px;
+      padding:14px 18px; border-radius:14px;
+      background:rgba(255,107,26,.08); border:1px solid rgba(255,107,26,.3);
+    }
+    .file-selected.show { display:flex; }
+    .file-icon-wrap {
+      width:42px; height:42px; border-radius:10px;
+      background:linear-gradient(135deg,var(--saffron),var(--gold));
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; flex-shrink:0;
+    }
+    .file-info { flex:1; min-width:0; }
+    .file-name { font-size:13px; font-weight:500; color:var(--cream); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .file-size { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .file-remove {
+      background:none; border:none; color:var(--text-muted);
+      cursor:pointer; font-size:16px; padding:4px; transition:color .2s;
+    }
+    .file-remove:hover { color:var(--cream); }
+
+    /* SETTINGS */
+    .settings-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .setting-card {
+      padding:14px; border-radius:14px;
+      border:1px solid var(--border); background:var(--card);
+      display:flex; flex-direction:column; gap:7px; transition:background .4s, border-color .4s;
+    }
+    .setting-label {
+      font-size:10px; letter-spacing:.15em; text-transform:uppercase;
+      color:var(--text-muted); font-family:'Rajdhani',sans-serif;
+    }
+    .setting-select {
+      background:none; border:none; color:var(--cream);
+      font-family:'DM Sans',sans-serif; font-size:13px;
+      cursor:pointer; width:100%; outline:none; appearance:none; transition:color .4s;
+    }
+    .setting-select option { background:var(--select-opt-bg); color:var(--cream); }
+
+    /* GENERATE BUTTON */
+    .btn-generate {
+      position:relative; width:100%; padding:17px 32px; border:none; border-radius:16px;
+      background:linear-gradient(135deg,var(--saffron) 0%,#d45a00 50%,#c44b00 100%);
+      color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:17px;
+      letter-spacing:.12em; text-transform:uppercase; cursor:pointer; overflow:hidden;
+      transition:transform .2s, box-shadow .3s;
+      box-shadow:0 8px 32px var(--shadow-glow);
+    }
+    .btn-generate::before {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 60%);
+    }
+    .btn-generate:hover { transform:translateY(-2px); box-shadow:0 14px 48px var(--shadow-glow-hover); }
+    .btn-generate:active { transform:translateY(0); }
+    .btn-generate:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+    .btn-inner { position:relative; display:flex; align-items:center; justify-content:center; gap:10px; }
+
+    /* PROGRESS */
+    .progress-wrap { display:none; flex-direction:column; gap:14px; }
+    .progress-wrap.show { display:flex; }
+    .progress-steps { display:flex; gap:8px; }
+    .step { flex:1; display:flex; flex-direction:column; gap:6px; align-items:center; opacity:.3; transition:opacity .5s; }
+    .step.active { opacity:1; }
+    .step.done   { opacity:.7; }
+    .step-dot { width:8px; height:8px; border-radius:50%; background:var(--saffron); }
+    .step.active .step-dot { animation:pulse-dot 1.2s ease-in-out infinite; box-shadow:0 0 12px var(--saffron); }
+    @keyframes pulse-dot { 0%,100%{transform:scale(1)} 50%{transform:scale(1.6)} }
+    .step-bar { width:100%; height:2px; background:rgba(255,107,26,.15); border-radius:2px; overflow:hidden; }
+    .step-bar-fill { height:100%; background:linear-gradient(90deg,var(--saffron),var(--gold)); width:0%; transition:width 3s linear; }
+    .step.active .step-bar-fill, .step.done .step-bar-fill { width:100%; }
+    .step-label { font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); font-family:'Rajdhani',sans-serif; text-align:center; }
+    .progress-status { text-align:center; font-size:13px; color:var(--saffron-light); font-style:italic; }
+
+    /* AUDIO RESULT */
+    .audio-result { display:none; flex-direction:column; gap:14px; }
+    .audio-result.show { display:flex; }
+    .audio-card {
+      padding:20px; border-radius:16px;
+      background:linear-gradient(135deg,rgba(255,107,26,.1),rgba(245,200,66,.05));
+      border:1px solid rgba(255,107,26,.3);
+    }
+    .audio-card-top { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .audio-waveform { display:flex; align-items:center; gap:3px; height:26px; }
+    .wave-bar { width:3px; background:var(--saffron); border-radius:2px; animation:wave-anim 1s ease-in-out infinite; }
+    .wave-bar:nth-child(1){height:40%;animation-delay:0s}.wave-bar:nth-child(2){height:70%;animation-delay:.1s}
+    .wave-bar:nth-child(3){height:100%;animation-delay:.2s}.wave-bar:nth-child(4){height:60%;animation-delay:.3s}
+    .wave-bar:nth-child(5){height:85%;animation-delay:.4s}.wave-bar:nth-child(6){height:45%;animation-delay:.5s}
+    .wave-bar:nth-child(7){height:75%;animation-delay:.6s}.wave-bar:nth-child(8){height:55%;animation-delay:.7s}
+    @keyframes wave-anim { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(.4)} }
+    .audio-label { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:15px; color:var(--cream); }
+    audio { width:100%; border-radius:8px; accent-color:var(--saffron); height:34px; }
+    .success-note { font-size:12px; color:var(--text-muted); text-align:center; }
+
+    /* FOOTER */
+    footer {
+      grid-column:1/-1; padding:18px 48px;
+      border-top:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      transition:border-color .4s;
+    }
+    .footer-left { font-size:11px; color:var(--text-muted); letter-spacing:.1em; }
+    .footer-right { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-muted); }
+    .footer-divider { opacity:.3; }
+
+    /* ═══════════════════════════════════════════
+       AUTH MODAL
+    ═══════════════════════════════════════════ */
+    .modal-overlay {
+      position:fixed; inset:0; z-index:100;
+      background:var(--modal-overlay);
+      backdrop-filter:blur(8px);
+      display:none; align-items:center; justify-content:center;
+      padding:20px;
+      transition:background .4s;
+    }
+    .modal-overlay.show { display:flex; }
+
+    .modal {
+      background:var(--modal-bg);
+      border:1px solid var(--border);
+      border-radius:24px;
+      width:100%; max-width:420px;
+      padding:0;
+      box-shadow:0 32px 80px rgba(0,0,0,.4);
+      overflow:hidden;
+      animation:modal-in .4s cubic-bezier(.34,1.3,.64,1) forwards;
+    }
+    @keyframes modal-in {
+      from{transform:scale(.92) translateY(20px); opacity:0}
+      to{transform:scale(1) translateY(0); opacity:1}
+    }
+
+    /* Modal header gradient bar */
+    .modal-bar {
+      height:4px;
+      background:linear-gradient(90deg,var(--saffron),var(--gold),var(--saffron));
+      background-size:200% 100%;
+      animation:shimmer 2.5s linear infinite;
+    }
+    @keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+
+    .modal-body { padding:36px 36px 32px; }
+
+    /* TABS */
+    .auth-tabs {
+      display:flex; gap:0; margin-bottom:32px;
+      border-bottom:1px solid var(--border);
+    }
+    .auth-tab {
+      flex:1; padding:10px; text-align:center;
+      font-family:'Rajdhani',sans-serif; font-weight:700;
+      font-size:13px; letter-spacing:.15em; text-transform:uppercase;
+      cursor:pointer; color:var(--text-muted);
+      border-bottom:2px solid transparent;
+      margin-bottom:-1px;
+      transition:color .2s, border-color .2s;
+      background:none; border-left:none; border-right:none; border-top:none;
+    }
+    .auth-tab.active { color:var(--saffron); border-bottom-color:var(--saffron); }
+
+    /* FORM PANELS */
+    .auth-panel { display:none; flex-direction:column; gap:20px; }
+    .auth-panel.active { display:flex; }
+
+    .modal-greeting {
+      font-family:'Playfair Display',serif; font-size:22px; font-weight:900;
+      color:var(--cream); line-height:1.2; margin-bottom:4px;
+    }
+    .modal-greeting em {
+      font-style:normal;
+      background:linear-gradient(90deg,var(--saffron),var(--gold));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .modal-sub { font-size:13px; color:var(--text-muted); margin-bottom:4px; }
+
+    /* INPUTS */
+    .field { display:flex; flex-direction:column; gap:7px; }
+    .field label {
+      font-family:'Rajdhani',sans-serif; font-size:10px;
+      letter-spacing:.18em; text-transform:uppercase; color:var(--text-muted);
+    }
+    .field input {
+      padding:12px 16px;
+      border-radius:10px;
+      border:1px solid var(--input-border);
+      background:var(--input-bg);
+      color:var(--cream);
+      font-family:'DM Sans',sans-serif; font-size:14px;
+      outline:none; transition:border-color .25s, box-shadow .25s, background .4s, color .4s;
+    }
+    .field input::placeholder { color:var(--text-muted); }
+    .field input:focus {
+      border-color:var(--input-focus);
+      box-shadow:0 0 0 3px rgba(255,107,26,.1);
+    }
+
+    /* AUTH MESSAGE */
+    .auth-msg {
+      font-size:12px; padding:10px 14px; border-radius:8px;
+      display:none; align-items:center; gap:8px;
+      font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:.05em;
+    }
+    .auth-msg.show { display:flex; }
+    .auth-msg.error { background:rgba(255,80,80,.1); border:1px solid rgba(255,80,80,.3); color:#ff8080; }
+    .auth-msg.success { background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3); color:#4ade80; }
+
+    /* SUBMIT BUTTON */
+    .btn-auth-submit {
+      width:100%; padding:14px;
+      border:none; border-radius:12px;
+      background:linear-gradient(135deg,var(--saffron) 0%,#d45a00 50%,#c44b00 100%);
+      color:#fff; font-family:'Rajdhani',sans-serif;
+      font-weight:700; font-size:15px; letter-spacing:.12em; text-transform:uppercase;
+      cursor:pointer; position:relative; overflow:hidden;
+      transition:transform .2s, box-shadow .3s;
+      box-shadow:0 6px 24px var(--shadow-glow);
+    }
+    .btn-auth-submit::before {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,.15),transparent 60%);
+    }
+    .btn-auth-submit:hover { transform:translateY(-1px); box-shadow:0 10px 36px var(--shadow-glow-hover); }
+    .btn-auth-submit:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .btn-auth-submit span { position:relative; }
+
+    /* SPINNER */
+    .spinner {
+      display:inline-block; width:14px; height:14px;
+      border:2px solid rgba(255,255,255,.3);
+      border-top-color:#fff; border-radius:50%;
+      animation:spin .7s linear infinite; margin-right:6px; vertical-align:middle;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    .modal-close {
+      position:absolute; top:16px; right:18px;
+      background:none; border:none; color:var(--text-muted);
+      font-size:22px; cursor:pointer; z-index:2;
+      line-height:1; transition:color .2s;
+    }
+    .modal-close:hover { color:var(--cream); }
+
+    /* DIVIDER */
+    .auth-divider {
+      display:flex; align-items:center; gap:12px; color:var(--text-muted); font-size:11px;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content:''; flex:1; height:1px; background:var(--border);
+    }
+
+    /* SWITCH LINK */
+    .auth-switch {
+      text-align:center; font-size:12px; color:var(--text-muted);
+    }
+    .auth-switch a {
+      color:var(--saffron); cursor:pointer; font-weight:500; text-decoration:none;
+    }
+    .auth-switch a:hover { text-decoration:underline; }
+
+    /* RESPONSIVE */
+    @media (max-width:860px) {
+      .wrapper { grid-template-columns:1fr; }
+      .left-panel, .right-panel { grid-column:1; border:none; padding:36px 24px; }
+      .left-panel { padding-bottom:0; }
+      header, footer { padding:18px 24px; }
+      .headline-wrap { min-height:220px; }
+      .header-badge span { display:none; }
+      .modal-body { padding:28px 24px 24px; }
+    }
+
+    /* ENTRY ANIMATIONS */
+    .fade-up { opacity:0; transform:translateY(24px); animation:fadeUp .7s ease forwards; }
+    @keyframes fadeUp { to{opacity:1; transform:translateY(0)} }
+    .delay-1{animation-delay:.1s} .delay-2{animation-delay:.22s}
+    .delay-3{animation-delay:.34s} .delay-4{animation-delay:.46s}
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<!-- ═══════════════════ AUTH MODAL ═══════════════════ -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal" style="position:relative">
+    <div class="modal-bar"></div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-body">
+
+      <!-- TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin"    onclick="switchTab('login')">Login</button>
+        <button class="auth-tab"        id="tabSignup"   onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- LOGIN PANEL -->
+      <div class="auth-panel active" id="panelLogin">
+        <div>
+          <div class="modal-greeting">Wapas <em>aaye!</em></div>
+          <div class="modal-sub">अपने खाते में लॉग इन करें — Login to your account</div>
+        </div>
+        <div class="auth-msg" id="loginMsg"></div>
+        <div class="field">
+          <label>Email पता</label>
+          <input type="email" id="loginEmail" placeholder="aap@example.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn-auth-submit" id="btnLogin" onclick="doLogin()">
+          <span>🎙️ &nbsp;Login करें</span>
+        </button>
+        <div class="auth-switch">
+          खाता नहीं है? <a onclick="switchTab('signup')">Sign up करें</a>
+        </div>
+      </div>
+
+      <!-- SIGNUP PANEL -->
+      <div class="auth-panel" id="panelSignup">
+        <div>
+          <div class="modal-greeting"><em>Namaskar!</em> Swagat hai</div>
+          <div class="modal-sub">नया खाता बनाएं — Create your account</div>
+        </div>
+        <div class="auth-msg" id="signupMsg"></div>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="signupUsername" placeholder="aapka_naam" autocomplete="username">
+        </div>
+        <div class="field">
+          <label>Email पता</label>
+          <input type="email" id="signupEmail" placeholder="aap@example.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="signupPassword" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <button class="btn-auth-submit" id="btnSignup" onclick="doSignup()">
+          <span>✨ &nbsp;Account बनाएं</span>
+        </button>
+        <div class="auth-switch">
+          पहले से खाता है? <a onclick="switchTab('login')">Login करें</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-group">
+      <div class="logo-icon">📻</div>
+      <div class="logo-text">
+        <span class="logo-hindi">समाचार वाणी</span>
+        <span class="logo-sub">Samachar Vani · AI Podcast Engine</span>
+      </div>
+    </div>
+    <div class="header-right">
+
+      <!-- THEME TOGGLE -->
+      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <span class="toggle-icon">🌙</span>
+        <div class="toggle-track"><div class="toggle-knob" id="toggleKnob">☀️</div></div>
+        <span class="toggle-icon">☀️</span>
+      </div>
+
+      <!-- NOT LOGGED IN: show login/signup buttons -->
+      <div class="header-auth" id="headerAuthBtns">
+        <button class="btn-auth-ghost" onclick="openModal('login')">Login</button>
+        <button class="btn-auth-solid" onclick="openModal('signup')">Sign Up</button>
+      </div>
+
+      <!-- LOGGED IN: show user badge -->
+      <div class="user-badge" id="userBadge">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <span class="user-name" id="userNameLabel">—</span>
+        <button class="btn-logout" onclick="doLogout()" title="Logout">✕</button>
+      </div>
+
+      <div class="header-badge">
+        <div class="badge-dot"></div>
+        <span>Online</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <div class="ticker-item">
+        <span class="ticker-dot"></span> Upload your Hindi newspaper PDF
+        <span class="ticker-dot"></span> Get an AI-narrated podcast in minutes
+        <span class="ticker-dot"></span> Chai peekar suniye ☕
+        <span class="ticker-dot"></span> Drive karte karte khabar paiye 🚗
+        <span class="ticker-dot"></span> समाचार सुनिए, दिन बनाइए
+        <span class="ticker-dot"></span> अपनी भाषा में सुनें, अपनी भाषा में समझें
+        <span class="ticker-dot"></span> Powered by Samachar Vani AI
+        <span class="ticker-dot"></span>
+      </div>
+      <div class="ticker-item">
+        <span class="ticker-dot"></span> Upload your Hindi newspaper PDF
+        <span class="ticker-dot"></span> Get an AI-narrated podcast in minutes
+        <span class="ticker-dot"></span> Chai peekar suniye ☕
+        <span class="ticker-dot"></span> Drive karte karte khabar paiye 🚗
+        <span class="ticker-dot"></span> समाचार सुनिए, दिन बनाइए
+        <span class="ticker-dot"></span> अपनी भाषा में सुनें, अपनी भाषा में समझें
+        <span class="ticker-dot"></span> Powered by Samachar Vani AI
+        <span class="ticker-dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="eyebrow fade-up">Hindi News · AI Voice</div>
+
+    <div class="headline-wrap fade-up delay-1" id="headlineWrap"></div>
+
+    <div class="lang-row fade-up delay-1">
+      <span class="lang-pill en" id="langPill">EN</span>
+      <div class="slide-dots" id="slideDots"></div>
+    </div>
+
+    <p class="tagline fade-up delay-2">
+      Drop a Hindi newspaper PDF. Samachar Vani turns it into a crisp,
+      AI-narrated podcast — perfect for your <strong>morning chai ritual</strong>,
+      your <strong>commute</strong>, or a lazy <strong>Sunday afternoon</strong> with poha and jalebi.
+    </p>
+
+    <div class="lifestyle-chips fade-up delay-3">
+      <div class="chip">☕ Chai ke saath</div>
+      <div class="chip">🚗 Drive karte karte</div>
+      <div class="chip">🌅 Subah ki shuruaat</div>
+      <div class="chip">🍽️ Nashte ke time</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="upload-section-title fade-up">Upload Newspaper</div>
+
+    <!-- LOCKED STATE -->
+    <div class="upload-locked show fade-up delay-1" id="uploadLocked">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-title">Login karein, phir sunein</div>
+      <div class="lock-sub">
+        लॉगिन करने के बाद अपना अखबार अपलोड करें<br>
+        and turn it into your personal podcast.
+      </div>
+      <div class="lock-actions">
+        <button class="btn-lock-login" onclick="openModal('login')">Login</button>
+        <button class="btn-lock-signup" onclick="openModal('signup')">Sign Up — Free</button>
+      </div>
+    </div>
+
+    <!-- UPLOAD PANEL (shown after login) -->
+    <div class="upload-panel" id="uploadPanel">
+
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="file" accept=".pdf,.jpg,.png,.jpeg" onchange="handleFile(this)">
+        <div class="drop-icon">📰</div>
+        <div class="drop-title">Drop your newspaper here</div>
+        <div class="drop-sub">Drag & drop or click to browse<br>Hindi newspaper PDF or image</div>
+        <div class="drop-formats">
+          <span class="fmt-tag">PDF</span>
+          <span class="fmt-tag">JPG</span>
+          <span class="fmt-tag">PNG</span>
+        </div>
+      </div>
+
+      <div class="file-selected" id="fileSelected">
+        <div class="file-icon-wrap">📄</div>
+        <div class="file-info">
+          <div class="file-name" id="fileName">—</div>
+          <div class="file-size" id="fileSize">—</div>
+        </div>
+        <button class="file-remove" onclick="clearFile()">✕</button>
+      </div>
+
+      <div class="settings-row">
+        <div class="setting-card">
+          <div class="setting-label">Voice Style</div>
+          <select class="setting-select">
+            <option>Formal Anchor</option>
+            <option>Friendly Host</option>
+            <option>Dramatic News</option>
+          </select>
+        </div>
+        <div class="setting-card">
+          <div class="setting-label">Speed</div>
+          <select class="setting-select">
+            <option>Normal</option>
+            <option>Slow</option>
+            <option>Fast</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-generate" id="generateBtn" onclick="upload()" disabled>
+        <div class="btn-inner"><span>🎙️</span> Podcast Banao</div>
+      </button>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-steps">
+          <div class="step" id="step1">
+            <div class="step-dot"></div>
+            <div class="step-bar"><div class="step-bar-fill"></div></div>
+            <div class="step-label">Padh raha hoon</div>
+          </div>
+          <div class="step" id="step2">
+            <div class="step-dot"></div>
+            <div class="step-bar"><div class="step-bar-fill"></div></div>
+            <div class="step-label">Samajh raha hoon</div>
+          </div>
+          <div class="step" id="step3">
+            <div class="step-dot"></div>
+            <div class="step-bar"><div class="step-bar-fill"></div></div>
+            <div class="step-label">Bol raha hoon</div>
+          </div>
+        </div>
+        <div class="progress-status" id="progressStatus">Processing your newspaper...</div>
+      </div>
+
+      <div class="audio-result" id="audioResult">
+        <div class="audio-card">
+          <div class="audio-card-top">
+            <div class="audio-waveform">
+              <div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div><div class="wave-bar"></div>
+              <div class="wave-bar"></div><div class="wave-bar"></div>
+            </div>
+            <div class="audio-label">आपका समाचार तैयार है!</div>
+          </div>
+          <audio controls id="audioPlayer"></audio>
+        </div>
+        <div class="success-note">Chai banaiye aur suniye 🍵</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">समाचार वाणी · Samachar Vani · 2026</div>
+    <div class="footer-right">
+      <span>Hindi First</span>
+      <span class="footer-divider">·</span>
+      <span>AI Powered</span>
+      <span class="footer-divider">·</span>
+      <span>Made in Bharat 🇮🇳</span>
+    </div>
+  </footer>
+
+</div><!-- /wrapper -->
+
+<script>
+/* ════════════════════════════════════════════
+   SESSION STATE
+════════════════════════════════════════════ */
+let currentUser = null; // { user_id, username, email }
+
+function setUser(user) {
+  currentUser = user;
+  // Update header
+  document.getElementById('headerAuthBtns').style.display = user ? 'none' : 'flex';
+  const badge = document.getElementById('userBadge');
+  if (user) {
+    badge.classList.add('show');
+    document.getElementById('userAvatar').textContent = (user.username || user.email || '?')[0].toUpperCase();
+    document.getElementById('userNameLabel').textContent = user.username || user.email;
+  } else {
+    badge.classList.remove('show');
+  }
+  // Toggle upload panel
+  document.getElementById('uploadLocked').classList.toggle('show', !user);
+  document.getElementById('uploadPanel').classList.toggle('show', !!user);
+}
+
+/* ════════════════════════════════════════════
+   MODAL
+════════════════════════════════════════════ */
+function openModal(tab = 'login') {
+  document.getElementById('authModal').classList.add('show');
+  switchTab(tab);
+  clearMessages();
+  // Focus first input after animation
+  setTimeout(() => {
+    const input = tab === 'login'
+      ? document.getElementById('loginEmail')
+      : document.getElementById('signupUsername');
+    input && input.focus();
+  }, 350);
+}
+function closeModal() {
+  document.getElementById('authModal').classList.remove('show');
+  clearMessages();
+}
+// Close on overlay click
+document.getElementById('authModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+// Close on Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function switchTab(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
+  document.getElementById('panelLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('panelSignup').classList.toggle('active', tab === 'signup');
+  clearMessages();
+}
+
+function clearMessages() {
+  ['loginMsg','signupMsg'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('show','error','success');
+    el.textContent = '';
+  });
+}
+
+function showMsg(id, text, type = 'error') {
+  const el = document.getElementById(id);
+  el.textContent = (type === 'error' ? '⚠ ' : '✓ ') + text;
+  el.className = 'auth-msg show ' + type;
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (loading) {
+    btn.disabled = true;
+    btn.innerHTML = `<span><span class="spinner"></span>Thoda ruko...</span>`;
+  } else {
+    btn.disabled = false;
+  }
+}
+
+/* ════════════════════════════════════════════
+   LOGIN — calls POST /login
+════════════════════════════════════════════ */
+async function doLogin() {
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) {
+    showMsg('loginMsg', 'Email aur password dono bharein.'); return;
+  }
+
+  setLoading('btnLogin', true);
+  clearMessages();
+
+  try {
+    // FastAPI expects query params for the simple /login endpoint
+    const form = new FormData();
+    form.append("email", email);
+    form.append("password", password);
+
+    const res = await fetch("/login", {
+    method: "POST",
+    body: form
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      showMsg('loginMsg', 'Email ya password galat hai. Dobara try karein.');
+      document.getElementById('btnLogin').disabled = false;
+      document.getElementById('btnLogin').innerHTML = `<span>🎙️ &nbsp;Login करें</span>`;
+      return;
+    }
+
+    // Success
+    showMsg('loginMsg', 'Login ho gaya! Swagat hai 🎉', 'success');
+    setTimeout(() => {
+      closeModal();
+      setUser({ user_id: data.user_id, email, username: email.split('@')[0] });
+    }, 900);
+
+  } catch(e) {
+    showMsg('loginMsg', 'Server se connect nahi ho paya. Try again.');
+    document.getElementById('btnLogin').disabled = false;
+    document.getElementById('btnLogin').innerHTML = `<span>🎙️ &nbsp;Login करें</span>`;
+  }
+}
+
+/* ════════════════════════════════════════════
+   SIGNUP — calls POST /signup
+════════════════════════════════════════════ */
+async function doSignup() {
+  const username = document.getElementById('signupUsername').value.trim();
+  const email    = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+
+  if (!username || !email || !password) {
+    showMsg('signupMsg', 'Sabhi fields fill karein.'); return;
+  }
+  if (password.length < 6) {
+    showMsg('signupMsg', 'Password kam se kam 6 characters ka hona chahiye.'); return;
+  }
+
+  setLoading('btnSignup', true);
+  clearMessages();
+
+  try {
+    const form = new FormData();
+    form.append("username", username);
+    form.append("email", email);
+    form.append("password", password);
+
+    const res = await fetch("/signup", {
+    method: "POST",
+    body: form
+    });
+    const data = await res.json();
+
+    if (data.error || (data.detail && data.detail.length)) {
+      showMsg('signupMsg', data.error || 'Kuch gadbad ho gayi. Try again.');
+      document.getElementById('btnSignup').disabled = false;
+      document.getElementById('btnSignup').innerHTML = `<span>✨ &nbsp;Account बनाएं</span>`;
+      return;
+    }
+
+    // Success — auto login
+    showMsg('signupMsg', 'Account ban gaya! Ab login karwa rahe hain... 🎉', 'success');
+    document.getElementById('signupPassword').value = '';
+
+    setTimeout(async () => {
+      // Auto-login after signup
+      try {
+        const loginRes  = await fetch(`/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`, { method:'POST' });
+        const loginData = await loginRes.json();
+        closeModal();
+        setUser({ user_id: loginData.user_id, email, username });
+      } catch {
+        switchTab('login');
+        document.getElementById('loginEmail').value = email;
+      }
+    }, 1000);
+
+  } catch(e) {
+    showMsg('signupMsg', 'Server se connect nahi ho paya. Try again.');
+    document.getElementById('btnSignup').disabled = false;
+    document.getElementById('btnSignup').innerHTML = `<span>✨ &nbsp;Account बनाएं</span>`;
+  }
+}
+
+/* ════════════════════════════════════════════
+   LOGOUT
+════════════════════════════════════════════ */
+function doLogout() {
+  setUser(null);
+  // Reset upload area
+  clearFile();
+  document.getElementById('audioResult').classList.remove('show');
+  document.getElementById('progressWrap').classList.remove('show');
+}
+
+/* ════════════════════════════════════════════
+   ENTER KEY support in modal inputs
+════════════════════════════════════════════ */
+['loginEmail','loginPassword'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+});
+['signupUsername','signupEmail','signupPassword'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') doSignup(); });
+});
+
+/* ════════════════════════════════════════════
+   ROTATING HEADLINES
+════════════════════════════════════════════ */
+const headlines = [
+  { lang:'en', html:`Your morning <em>khabar,</em><br>now speaks<br>to you.` },
+  { lang:'hi', html:`आपकी सुबह की <em>खबर,</em><br>अब आपसे<br>खुद बोलती है।` },
+  { lang:'en', html:`Sip your <em>chai.</em><br>We'll read the<br>news for you.` },
+  { lang:'hi', html:`चाय पीजिए,<br><em>समाचार वाणी</em><br>पढ़ेगी खबरें।` },
+  { lang:'en', html:`Drive, walk, relax —<br>your <em>news</em><br>follows you.` },
+  { lang:'hi', html:`गाड़ी चलाएं, टहलें —<br><em>खबर</em> हमेशा<br>साथ है।` },
+];
+const wrap     = document.getElementById('headlineWrap');
+const langPill = document.getElementById('langPill');
+const dotsWrap = document.getElementById('slideDots');
+
+headlines.forEach((h,i) => {
+  const el = document.createElement('h1');
+  el.className = 'headline' + (i===0?' active':'');
+  el.innerHTML = h.html;
+  wrap.appendChild(el);
+});
+headlines.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.className = 'slide-dot'+(i===0?' active':'');
+  d.addEventListener('click',()=>{ goTo(i); resetTimer(); });
+  dotsWrap.appendChild(d);
+});
+
+let current=0, timer=null;
+function goTo(next) {
+  const els  = wrap.querySelectorAll('.headline');
+  const dots = dotsWrap.querySelectorAll('.slide-dot');
+  els[current].classList.remove('active');
+  els[current].classList.add('exit');
+  const prev=current;
+  setTimeout(()=>els[prev].classList.remove('exit'),600);
+  current=next;
+  els[current].classList.add('active');
+  const isHi = headlines[current].lang==='hi';
+  langPill.textContent = isHi ? 'हि' : 'EN';
+  langPill.className   = 'lang-pill '+(isHi?'hi':'en');
+  dots.forEach((d,i)=>d.classList.toggle('active',i===current));
+}
+function resetTimer() { clearInterval(timer); timer=setInterval(()=>goTo((current+1)%headlines.length),3400); }
+wrap.addEventListener('mouseenter',()=>clearInterval(timer));
+wrap.addEventListener('mouseleave',resetTimer);
+resetTimer();
+
+/* ════════════════════════════════════════════
+   THEME TOGGLE
+════════════════════════════════════════════ */
+function toggleTheme() {
+  const html   = document.documentElement;
+  const isDark = html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme', isDark?'light':'dark');
+  document.getElementById('toggleKnob').textContent = isDark?'🌙':'☀️';
+}
+
+/* ════════════════════════════════════════════
+   DRAG & DROP
+════════════════════════════════════════════ */
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e=>{ e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  const files=e.dataTransfer.files;
+  if(files.length){ document.getElementById('file').files=files; handleFile(document.getElementById('file')); }
+});
+
+function handleFile(input) {
+  const file=input.files[0]; if(!file) return;
+  document.getElementById('fileName').textContent=file.name;
+  document.getElementById('fileSize').textContent=(file.size/1024).toFixed(1)+' KB';
+  document.getElementById('fileSelected').classList.add('show');
+  document.getElementById('generateBtn').disabled=false;
+}
+function clearFile() {
+  document.getElementById('file').value='';
+  document.getElementById('fileSelected').classList.remove('show');
+  document.getElementById('generateBtn').disabled=true;
+}
+
+/* ════════════════════════════════════════════
+   UPLOAD & PIPELINE
+════════════════════════════════════════════ */
+const statusMessages=[
+  'Aapka akhbaar padh raha hoon...',
+  'Khabar samajh raha hoon...',
+  'Awaaz taiyar ho rahi hai...',
+];
+function setStep(n){
+  ['step1','step2','step3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.classList.remove('active','done');
+    if(i<n) el.classList.add('done');
+    if(i===n) el.classList.add('active');
+  });
+  document.getElementById('progressStatus').textContent=statusMessages[n]||'Processing...';
+}
+async function upload(){
+  const file=document.getElementById('file').files[0]; if(!file) return;
+  document.getElementById('generateBtn').disabled=true;
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('audioResult').classList.remove('show');
+  setStep(0);
+  const form=new FormData(); form.append('file',file);
+  try{
+    const res=await fetch('/upload',{method:'POST',body:form});
+    const data=await res.json();
+    setStep(1); checkStatus(data.job_id);
+  }catch(e){
+    document.getElementById('progressStatus').textContent='Error uploading. Please try again.';
+  }
+}
+async function checkStatus(id){
+  let tick=0;
+  const iv=setInterval(async()=>{
+    tick++; if(tick===3) setStep(2);
+    try{
+      const res=await fetch('/job/'+id);
+      const data=await res.json();
+      if(data.status==='completed'){
+        clearInterval(iv);
+        document.getElementById('progressWrap').classList.remove('show');
+        document.getElementById('audioPlayer').src='/audio/'+id;
+        document.getElementById('audioResult').classList.add('show');
+        document.getElementById('generateBtn').disabled=false;
+      }
+    }catch(e){}
+  },3000);
+}
+
+// Init: not logged in
+setUser(null);
+</script>
+</body>
+</html>

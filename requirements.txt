@@ -1,0 +1,36 @@
+# Hindi Newspaper → Podcast Pipeline
+# Install: pip install -r requirements.txt
+
+# Core CV & ML
+torch>=2.2.0               # M1 MPS support
+torchvision>=0.17.0
+ultralytics>=8.1.0         # YOLOv8
+opencv-python>=4.9.0
+numpy>=1.26.0
+Pillow>=10.2.0
+
+# OCR
+easyocr>=1.7.1
+
+# TTS (choose one or both)
+gTTS>=2.5.0                 # Simple, reliable
+edge-tts>=6.1.9             # Better quality (async)
+
+# Audio merging (for long scripts)
+pydub>=0.25.1
+# Note: also requires ffmpeg — install via: brew install ffmpeg
+
+# NLP / Summarization
+# Uncomment for abstractive summarization (requires ~2GB download):
+# transformers>=4.38.0
+# sentencepiece>=0.2.0
+
+# Utilities
+tqdm>=4.66.0
+
+fastapi
+uvicorn
+sqlmodel
+
+passlib[bcrypt]
+python-jose
