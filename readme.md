@@ -22,6 +22,7 @@ Feed it a photo of a Hindi newspaper. It produces a fully narrated audio podcast
 Tested on **Dainik Jagran** front pages. Works on any Hindi newspaper with a standard multi-column layout.
 
 ---
+<img width="1431" height="697" alt="Screenshot 2026-03-08 at 7 39 14 PM" src="https://github.com/user-attachments/assets/c539782a-ced4-42db-8c57-2e9a7d3a7ec7" />
 
 # 🌐 Web Application — Samachar Vani
 
