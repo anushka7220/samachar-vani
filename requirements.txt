@@ -10,7 +10,7 @@ numpy>=1.26.0
 Pillow>=10.2.0
 
 # OCR
-easyocr>=1.7.1
+easyocr
 
 # TTS (choose one or both)
 gTTS>=2.5.0                 # Simple, reliable
