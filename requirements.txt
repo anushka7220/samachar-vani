@@ -36,3 +36,4 @@ passlib[bcrypt]
 python-jose
 
 groq
+python-bidi==0.4.2
