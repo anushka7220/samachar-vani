@@ -34,3 +34,5 @@ sqlmodel
 
 passlib[bcrypt]
 python-jose
+
+groq

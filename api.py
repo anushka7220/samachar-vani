@@ -15,7 +15,9 @@ from sqlmodel import select
 from app.models import User
 from app.auth import hash_password, verify_password
 import ollama
-
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 # ---------------- APP ----------------
 

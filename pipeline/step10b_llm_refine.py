@@ -1,9 +1,10 @@
-import ollama
+from groq import Groq
 
 
 class LocalSummaryRefiner:
 
-    def __init__(self, model="llama3:8b"):
+    def __init__(self, model="llama-3.1-8b-instant"):
+        self.client = Groq()
         self.model = model
 
     def refine(self, headline: str, summary: str) -> str:
@@ -12,36 +13,39 @@ class LocalSummaryRefiner:
             return summary
 
         prompt = f"""
-        आप एक पेशेवर हिंदी समाचार संपादक हैं।
+आप एक पेशेवर हिंदी समाचार संपादक हैं।
 
-        कार्य:
-        नीचे दिए गए समाचार सारांश को ठीक करें।
+कार्य:
+नीचे दिए गए समाचार सारांश को ठीक करें।
 
-        सख्त नियम:
-        - केवल शुद्ध हिंदी में उत्तर दें।
-        - अंग्रेज़ी का प्रयोग बिल्कुल न करें।
-        - कोई व्याख्या, नोट, निर्देश या अतिरिक्त पाठ न लिखें।
-        - "शीर्षक:" या "सारांश:" जैसे शब्द न लिखें।
-        - केवल सुधरा हुआ समाचार सारांश लिखें।
-        - 3 से 4 वाक्य ही लिखें।
-        - शीर्षक को दोहराएँ नहीं।
+सख्त नियम:
+- केवल शुद्ध हिंदी में उत्तर दें।
+- अंग्रेज़ी का प्रयोग बिल्कुल न करें।
+- कोई व्याख्या, नोट, निर्देश या अतिरिक्त पाठ न लिखें।
+- "शीर्षक:" या "सारांश:" जैसे शब्द न लिखें।
+- केवल सुधरा हुआ समाचार सारांश लिखें।
+- 3 से 4 वाक्य ही लिखें।
+- शीर्षक को दोहराएँ नहीं।
 
-        शीर्षक:
-        {headline}
+शीर्षक:
+{headline}
 
-        सारांश:
-        {summary}
+सारांश:
+{summary}
 
-        सुधरा हुआ सारांश:
-        """
+सुधरा हुआ सारांश:
+"""
 
         try:
-            response = ollama.chat(
+            response = self.client.chat.completions.create(
                 model=self.model,
-                messages=[{"role": "user", "content": prompt}]
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.2
             )
 
-            text = response["message"]["content"].strip()
+            text = response.choices[0].message.content.strip()
 
             return text
 
