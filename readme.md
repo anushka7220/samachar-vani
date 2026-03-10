@@ -11,7 +11,9 @@
 
 ---
 
-# 📖 What It Does(soon demo will be available)
+# 📖 What It Does
+demo - https://drive.google.com/file/d/14TCCNUdn-WypWXgVfme1zP7VLqiOuTQI/view?usp=drive_link
+
 
 Feed it a photo of a Hindi newspaper. It produces a fully narrated audio podcast of the **top 3 most important stories — automatically.**
 
